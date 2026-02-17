@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>MapLibre + GeoJSON demo</title>
+
+    <!-- MapLibre GL JS (CSS + JS) from CDN -->
+    <link
+      href="https://unpkg.com/maplibre-gl@5.7.1/dist/maplibre-gl.css"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/maplibre-gl@5.7.1/dist/maplibre-gl.js"></script>
+
+    <style>
+      html, body { height: 100%; margin: 0; }
+      #map { height: 100%; }
+    </style>
+  </head>
+
+  <body>
+    <input id="search">
+    <div id="map"></div>
+
+    <script>
+      // Simple raster basemap style (OSM tiles)
+      const style = {
+        version: 8,
+        sources: {
+          osm: {
+            type: "raster",
+            tiles: [
+              "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+            ],
+            tileSize: 256,
+            attribution: "&copy; OpenStreetMap contributors"
+          }
+        },
+        layers: [
+          { id: "osm", type: "raster", source: "osm" }
+        ]
+      };
+
+      const map = new maplibregl.Map({
+        container: "map",
+        style,
+        center: [174.7633, -36.8485], // default (Auckland-ish) until we fit to data
+        zoom: 16
+      });
+
+      map.addControl(new maplibregl.NavigationControl(), "top-right");
+
+      const searchInput = document.getElementById("search");
+      searchInput.addEventListener("keydown", async (e) => {
+        if (e.key !== "Enter") return;
+        const text = searchInput.value.trim();
+        if (!text) return;
+        try {
+          const resp = await fetch("http://localhost:8081/search", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ address: text })
+          });
+          const data = await resp.json();
+          if (typeof data.lng === "number" && typeof data.lat === "number") {
+            map.flyTo({ center: [data.lng, data.lat], zoom: 18 });
+          }
+        } catch (err) {
+          console.error("Search failed:", err);
+        }
+      });
+
+      map.on("load", async () => {
+        //const resp = await fetch("./out.geojson");
+        //const data = await resp.json();
+
+        map.addSource("flood_plains", {
+            type: "vector",
+            url: "http://localhost:8080/data/flood_plains.json"
+        });
+
+        map.addLayer({
+            id: "flood-fill",
+            type: "fill",
+            source: "flood_plains",
+            "source-layer": "WEEKLY__Saturday__Flood_Plains",
+            paint: {
+                "fill-color": "#0066ff",
+                "fill-opacity": 0.35
+            }
+        });
+
+        map.addSource("overland_flow", {
+            type: "vector",
+            url: "http://localhost:8080/data/overland_flow.json"
+        });
+
+        map.addLayer({
+            id: "overland-flow",
+            type: "line",
+            source: "overland_flow",
+            "source-layer": "Overland_Flow_Paths",
+            paint: {
+                "line-color": "#0077ff",
+                "line-width": 2,
+                "line-opacity": 0.6
+            }
+        })
+
+        map.addSource("addresses", {
+          type: "vector",
+          url: "http://localhost:8080/data/addresses.json"
+        });
+
+        map.addLayer({
+          id: "addresses",
+          type: "circle",
+          source: "addresses",
+          "source-layer": "nz_addresses",
+          paint: {
+            "circle-radius": 6,
+            "circle-opacity": 0.8
+          }
+        });
+
+        // Fit bounds (works great for Points; basic support for other types too)
+        const bounds = new maplibregl.LngLatBounds();
+
+        function extendBoundsFromCoords(coords) {
+          // coords may be [lng, lat] or nested arrays
+          if (typeof coords[0] === "number" && typeof coords[1] === "number") {
+            bounds.extend(coords);
+          } else {
+            coords.forEach(extendBoundsFromCoords);
+          }
+        }
+
+        for (const f of data.features || []) {
+          if (f.geometry && f.geometry.coordinates) {
+            extendBoundsFromCoords(f.geometry.coordinates);
+          }
+        }
+
+        if (!bounds.isEmpty()) {
+          map.fitBounds(bounds, { padding: 60, maxZoom: 18 });
+        }
+      });
+    </script>
+  </body>
+</html>
