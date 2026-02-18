@@ -73,7 +73,10 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showFloods, setShowFloods] = useState(true);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [mapStyle, setMapStyle] = useState('osm');
+  const [mapStyle, setMapStyle] = useState(() => {
+    const saved = localStorage.getItem('mapStyle');
+    return saved || 'osm';
+  });
 
   useEffect(() => {
     if (map.current) return;
@@ -150,6 +153,9 @@ function App() {
   const handleStyleChange = (e) => {
     const newStyle = e.target.value;
     setMapStyle(newStyle);
+    
+    // Save to localStorage
+    localStorage.setItem('mapStyle', newStyle);
 
     if (map.current) {
       map.current.setStyle(MAP_STYLES[newStyle].style);
