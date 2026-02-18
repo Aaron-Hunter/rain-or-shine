@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # TileServer GL - serves map tiles
+  tileserver:
+    image: maptiler/tileserver-gl:latest
+    container_name: rain-or-shine-tileserver
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./map-data/mbtiles:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Go Backend API - handles address search
+  backend:
+    build:
+      context: ./map-demo
+      dockerfile: Dockerfile
+    container_name: rain-or-shine-backend
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./map-data/nz-addresses.gpkg:/data/nz-addresses.gpkg:ro
+    environment:
+      - GPKG_PATH=/data/nz-addresses.gpkg
+    restart: unless-stopped
+    depends_on:
+      - tileserver
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8081"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend - React + Vite
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_TILE_SERVER_URL=http://localhost:8080
+        - VITE_API_URL=http://localhost:8081
+        - VITE_MAP_CENTER_LNG=174.7633
+        - VITE_MAP_CENTER_LAT=-36.8485
+        - VITE_MAP_ZOOM=16
+    container_name: rain-or-shine-frontend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    depends_on:
+      - tileserver
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  default:
+    name: rain-or-shine-network
