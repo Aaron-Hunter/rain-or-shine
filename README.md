@@ -1,6 +1,7 @@
 # rain-or-shine
 
 To run the demo you need Go and Docker installed.
+If you are on Windows you also need CGO working, so you need a gcc compiler installed and added to your PATH
 
 Run this in a terminal at `/map-demo`
 ```sh
@@ -14,6 +15,11 @@ docker run --rm -it \
 -v "$(pwd)/mbtiles:/data" \
 -p 8080:8080 \
 maptiler/tileserver-gl:latest
+```
+
+NOTE: on Windows you will need to run this instead for the tileserver
+```sh
+MSYS_NO_PATHCONV=1 docker run --rm -it -v "$(pwd -W)\mbtiles:/data" -p 8080:8080 maptiler/tileserver-gl:latest
 ```
 
 to run frontend go run in `/frontend`
