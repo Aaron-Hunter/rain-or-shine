@@ -15,3 +15,12 @@ docker run --rm -it \
 -p 8080:8080 \
 maptiler/tileserver-gl:latest
 ```
+
+to run frontend go run in `/frontend`
+```sh
+npm install
+npm run dev
+```
+
+### Full Run
+To run everything in the same terminal (without logs) run `./start.sh`
