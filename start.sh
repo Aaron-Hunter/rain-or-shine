@@ -19,7 +19,10 @@ pkill -f "go run" 2>/dev/null
 # Start TileServer GL
 echo "🗺️  Starting TileServer GL on port 8080..."
 cd map-data
-MSYS_NO_PATHCONV=1 docker run --rm -it -v "$(pwd -W)\mbtiles:/data" -p 8080:8080 maptiler/tileserver-gl:latest &
+docker run --rm -d \
+  -v "$(pwd)/mbtiles:/data" \
+  -p 8080:8080 \
+  maptiler/tileserver-gl:latest
 cd ..
 
 sleep 2
