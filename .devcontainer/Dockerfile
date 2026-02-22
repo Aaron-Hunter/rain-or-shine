@@ -5,6 +5,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zsh git-lfs \
   && rm -rf /var/lib/apt/lists/*
 
-RUN git lfs install
+RUN git lfs installgi
 
 WORKDIR /workspace
