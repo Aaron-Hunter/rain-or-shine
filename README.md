@@ -18,5 +18,35 @@ you will then need to bring this back down once you're done
 docker compose -f .devcontainer/docker-compose.yml down
 ```
 
-### Full Run
-To run everything in the same terminal (without logs) run `./start.sh`
+### Full frontend dev Run
+To run everything in the same terminal (without logs) run `./start.sh` -- this allows hot reloading for the frontend
+
+## Docker Compose
+We can build the app with docker compose `docker-compose up` 
+- not really sure why i wanted to do this other than to play with docker compose... as it does practically the same thing as the `./start.sh` script
+
+- I guess its a good way to test the docker files all build before deployment
+  - yup we will go with that... 
+
+
+## DEPLOYMENT
+
+### 1. In the beginning there was gcloud
+
+login and create project
+```bash
+gcloud auth login
+
+# AND GCLOUD SAID LET THERE BE LIGHT
+gcloud projects create rain-or-shine-nz
+```
+
+```bash
+# OR IF LIGHT WAS ALREADY THERE... 
+gcloud config set project rain-or-shine-nz
+```
+
+### 2. Deploy
+```bash
+./deploy-gcp.sh
+```

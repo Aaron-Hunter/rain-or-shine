@@ -17,6 +17,7 @@ export default function ControlsStack({
           <option value="osm">OpenStreetMap</option>
           <option value="simple">Simple Light</option>
           <option value="satellite">Satellite</option>
+          <option value="topographic">Topographic</option>
         </select>
       </div>
 
