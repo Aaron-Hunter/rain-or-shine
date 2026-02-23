@@ -59,5 +59,30 @@ export const MAP_STYLES = {
         { id: "satellite", type: "raster", source: "satellite" }
       ]
     }
+  },
+  topographic: {
+    name: "Topographic",
+    style: {
+      version: 8,
+      sources: {
+        carto: {
+          type: "raster",
+          tiles: ["https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"],
+          tileSize: 256,
+          attribution: "&copy; OpenStreetMap contributors, &copy; CARTO"
+        },
+        topo: {
+          type: "raster",
+          tiles: ["https://tile.opentopomap.org/{z}/{x}/{y}.png"],
+          tileSize: 256,
+          maxzoom: 17,
+          attribution: "&copy; OpenTopoMap"
+        }
+      },
+      layers: [
+        { id: "carto", type: "raster", source: "carto" },
+        { id: "topo-overlay", type: "raster", source: "topo", paint: { "raster-opacity": 0.8 } }
+      ]
+    }
   }
 };

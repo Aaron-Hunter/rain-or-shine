@@ -46,7 +46,6 @@ export default function MapView({ mapStyle, showFloods, onMapLoad }) {
     map.current.on("load", () => {
       setMapLoaded(true);
       addFloodLayers(map.current, showFloods);
-      console.log('✅ Map loaded!');
       if (onMapLoad) onMapLoad(map.current);
     });
 
