@@ -30,6 +30,8 @@ sleep 2
 # Start Go Backend
 echo "🔧 Starting Go backend on port 8081..."
 cd map-demo
+go mod download
+go mod tidy
 go run . &
 GO_PID=$!
 cd ..
@@ -39,6 +41,7 @@ sleep 2
 # Start Vite Frontend
 echo "⚛️  Starting Vite frontend on port 5173..."
 cd frontend
+npm install
 npm run dev &
 VITE_PID=$!
 cd ..
