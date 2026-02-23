@@ -13,7 +13,7 @@ RUN go mod download
 COPY . .
 
 # Copy address database (must be present in build context)
-COPY nz-addresses.gpkg /data/nz-addresses.gpkg
+COPY auckland-addresses.gpkg /data/auckland-addresses.gpkg
 
 # Build binary with CGO enabled
 RUN CGO_ENABLED=1 go build -o /app/server .
@@ -27,7 +27,7 @@ WORKDIR /root/
 
 # Copy binary from builder
 COPY --from=builder /app/server .
-COPY --from=builder /data/nz-addresses.gpkg /data/nz-addresses.gpkg
+COPY --from=builder /data/auckland-addresses.gpkg /data/auckland-addresses.gpkg
 
 # Copy static files (if any)
 COPY index.html .

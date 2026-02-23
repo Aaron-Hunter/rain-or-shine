@@ -102,12 +102,12 @@ if [ "$DEPLOY_BACKEND" = true ]; then
   cd map-demo
 
   echo "Copying address database into build context..."
-  cp ../map-data/nz-addresses.gpkg ./nz-addresses.gpkg
+  cp ../map-data/auckland-addresses.gpkg ./auckland-addresses.gpkg
 
   echo "Building Backend locally for linux/amd64..."
   docker buildx build --platform linux/amd64 -t $REGISTRY/$PROJECT_ID/$REPO_NAME/backend:latest --push .
 
-  rm -f ./nz-addresses.gpkg
+  rm -f ./auckland-addresses.gpkg
 
   # Deploy Backend
   gcloud run deploy rain-or-shine-backend \
@@ -120,7 +120,7 @@ if [ "$DEPLOY_BACKEND" = true ]; then
     --cpu 1 \
     --min-instances 0 \
     --max-instances 2 \
-    --set-env-vars GPKG_PATH=/data/nz-addresses.gpkg
+    --set-env-vars GPKG_PATH=/data/auckland-addresses.gpkg
 
   # Get Backend URL
   BACKEND_URL=$(gcloud run services describe rain-or-shine-backend --region=$REGION --format="value(status.url)")
