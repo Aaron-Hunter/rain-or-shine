@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import MapView from './components/MapView';
 import SearchBar from './components/SearchBar';
-import ControlsStack from './components/ControlsStack';
 import { updateFloodVisibility } from './utils/floodLayers';
 import { API_URL } from './config/mapConfig';
 import './index.css';
@@ -12,7 +11,7 @@ function App() {
   const [showFloods, setShowFloods] = useState(true);
   const [mapStyle, setMapStyle] = useState(() => {
     const saved = localStorage.getItem('mapStyle');
-    return saved || 'osm';
+    return saved || 'simple';
   });
 
   const handleSearch = async (e) => {
@@ -60,9 +59,6 @@ function App() {
         onSubmit={handleSearch}
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-      />
-
-      <ControlsStack
         mapStyle={mapStyle}
         onStyleChange={handleStyleChange}
         showFloods={showFloods}
