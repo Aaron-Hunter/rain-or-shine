@@ -101,7 +101,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	gpkgPath := os.Getenv("GPKG_PATH")
 	if gpkgPath == "" {
-		gpkgPath = filepath.Join("..", "map-data", "nz-addresses.gpkg")
+		gpkgPath = filepath.Join("..", "map-data", "auckland-addresses.gpkg")
 	}
 	var err error
 	db, err = sql.Open("sqlite", gpkgPath)
